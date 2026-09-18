@@ -1,10 +1,19 @@
 import LaTierraMedia.Baculo
+import LaTierraMedia.Guerrero
 
 describe "Pruebas de báculo" {
+  var guerreroMuchaVida = new Guerrero(vida = 100)
+  var guerreroPocaVida = new Guerrero(vida = 5)
+  var baculoBase = new Baculo()
+  var baculoBase100 = new Baculo(poderBase = 100)
 
   test "un báculo para un guerrero con mucha vida" {
-    var baculoBase = new Baculo()
-    assert.equals(250, baculoBase.poderOtorgado())
+    assert.equals(250, baculoBase.poderOtorgado(guerreroMuchaVida))
   }
-
+  test "un báculo de poder base 100 para un guerrero con poca vida" {
+    assert.equals(250, baculoBase100.poderOtorgado(guerreroPocaVida))
+  }
+  test "un báculo para un guerrero con poca vida tiene tope" {
+    assert.equals(400, baculoBase.poderOtorgado(guerreroPocaVida))
+  }
 }

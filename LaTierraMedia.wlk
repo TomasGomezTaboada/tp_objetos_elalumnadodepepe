@@ -9,7 +9,12 @@ object pepita{
 }
 
 class Guerrero{
-  
+  var property vida
+  const property armas = []
+
+  method tienePocaVida(){
+    return self.vida() < 10
+  } 
 }
 
 class Baculo{
