@@ -1,9 +1,10 @@
-import example.pepita
+import LaTierraMedia.Baculo
 
-describe "group of tests for pepita" {
+describe "Pruebas de báculo" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
+  test "un báculo para un guerrero con mucha vida" {
+    var baculoBase = new Baculo()
+    assert.equals(250, baculoBase.poderOtorgado())
   }
 
 }
