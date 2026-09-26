@@ -98,15 +98,15 @@ object gandalf{
     vida += cantidad
   }
 }
-
-object lebennin {
+/* Parte 2 */
+object lebennin{
   var property cantidadGuardias = 0
   method poderRequerido() = if (cantidadGuardias > 3) 1500 else 1000
   method puedePasar(viajero) = viajero.poder() > self.poderRequerido()
   method pasar(viajero) {}
 }
 
-object minasDeTirith {
+object minasDeTirith{
   method puedePasar(viajero) = viajero.estaArmado()
   method pasar(viajero) {
     viajero.perderVida(10*viajero.cantidadDeArmas())
@@ -120,15 +120,15 @@ object lossarnach{
   }
 }
 
-class Camino {
+class Camino{
   const property zonas = []
-  method puedePasar(viajero) = zonas.forall({ z => z.puedePasar(viajero) })
+  method puedePasar(viajero) = zonas.all({ z => z.puedePasar(viajero) })
   method pasar(viajero) {
     zonas.forEach({ z => z.pasar(viajero) })
   }
 }
 
-object tomBombadil {
+object tomBombadil{
   method poder() = 2000
   method cantidadDeArmas() = 100
   method estaArmado() = true
