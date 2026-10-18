@@ -60,10 +60,9 @@ class Maiar inherits Guerrero{
 }
 
 class Gollum inherits Hobbit{
-  override method poder() {
-    return super.poder() / 2
-  }
-
+  override method poder(){ 
+    return super() / 2
+}
 }
 
 class Humano inherits Guerrero{

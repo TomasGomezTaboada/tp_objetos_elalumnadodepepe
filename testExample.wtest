@@ -13,9 +13,9 @@ describe "Pruebas de báculo" {
 }
 
 describe "Pruebas de arsenal" {
-  test "Espada con multiplicador de 15 y llevada Enano" {
     var enano = new Enano(vida = 100, factorDePoder = 2)
     var espada = new Espada(multiplicador = 15)
+  test "Espada con multiplicador de 15 y llevada Enano" {
     assert.equals(espada.poderOtorgado(enano), 300)
 }
   test "Hacha con mango de 50 cm, con una hoja de 5kg" {
