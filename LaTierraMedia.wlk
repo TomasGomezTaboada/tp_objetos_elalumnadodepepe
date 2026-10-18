@@ -1,11 +1,41 @@
-
 class Guerrero{
-  var property vida
   const property armas = []
+  const property elementosUtiles = []
+  var property vida
 
-  method tienePocaVida(){
-    return self.vida() < 10
-  } 
+  method tienePocaVida(){ return vida < 10}
+
+  method poder() {
+    const multiplicadorVida = if (self.tienePocaVida()) 200 else 15
+    return (vida * multiplicadorVida) + (self.poderArmas() * 2)
+  }
+  method poderArmas() = armas.sum({ arma => arma.poderOtorgado(self) })
+
+  method cantidadDeArmas() = armas.size()
+  method estaArmado() = !armas.isEmpty()
+
+  method perderVida(cantidad) {
+    vida = 0.max(vida - cantidad)
+  }
+
+  method ganarVida(cantidad) {
+    vida += cantidad
+  }
+}
+
+class Hobbit inherits Guerrero{
+  method poder() = 10 
+}
+
+object daga{
+  method poderOtorgado(espada, guerrero) { return espada.poderOtorgado(guerrero) / 2  }
+}
+
+class Hacha{
+  var property largoMango
+  var property pesoHoja
+
+  method poderOtorgado(guerrero) { return largoMango * pesoHoja }
 }
 
 class Baculo{
@@ -22,33 +52,30 @@ class Baculo{
   }
 }
 
-
 class Espada{
   var property magia = magiaElfica
 
   method poderOtorgado(guerrero){
-    return 10*magia.poderOtorgado(guerrero)
+    return 10*magia.valorMagia(guerrero) + guerrero.valorOrigen()
   }
 }
 
 object magiaElfica{
-  method valor(guerrero) = 25
+  method valorMagia(guerrero) = 25
 }
 
 object magiaEnana{
-  method valor(guerrero) = guerrero.vida()/2
+  method valorMagia(guerrero) = guerrero.vida()/2
 }
 
 class FlechaBronce{
   const dia
   const mes
   const anio
-  const property fechaLustrado = new Date(day = dia, month = mes, year = anio)
-
   const poderBase = 100
 
-  method poderOtorgado(){
-    const tiempoDesdeLustrado = calendar.today() - self.fechaLustrado()
+  method poderOtorgado(fechaLustrado){
+    const tiempoDesdeLustrado = calendar.today() - fechaLustrado
 
     return 0.max(poderBase - tiempoDesdeLustrado)
   }
@@ -135,3 +162,5 @@ object tomBombadil{
   method perderVida(cantidad) {}
   method ganarVida(cantidad) {}
 }
+
+const gondor = new Camino(zonas = [lebennin, minasDeTirith])
