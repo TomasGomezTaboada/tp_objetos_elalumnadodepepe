@@ -12,6 +12,9 @@ describe "Pruebas de báculo" {
   }*/
 }
 
+const daga1 = new Daga(multiplicador = 8)
+const frodo = new Hobbit(vida = 50, armas = [daga1])
+
 describe "Pruebas de arsenal" {
     var enano = new Enano(vida = 100, factorDePoder = 2)
     var espada = new Espada(multiplicador = 15)
@@ -20,6 +23,13 @@ describe "Pruebas de arsenal" {
 }
   test "Hacha con mango de 50 cm, con una hoja de 5kg" {
     const hacha = new Hacha(largoMango = 50, pesoHoja = 5) 
-    assert.equals(hacha.poderOtorgado(), 250)
+    assert.equals(hacha.poderOtorgado(frodo), 250)
 }
+}
+
+
+describe "Pruebas de guerreros"{
+  test "Poder de Frodo Sin Armas"{ // Solo cuenta la vida pues cantElementos = 0
+    assert.equals(frodo.poder(),50)
+  }
 }

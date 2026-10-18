@@ -72,15 +72,11 @@ class Humano inherits Guerrero{
   method poder() = self.vida() + self.poderArmas() / self.limitadorDePoder()
 }
 
-object daga{
-  method poderOtorgado(espada, guerrero) { return espada.poderOtorgado(guerrero) / 2  }
-}
-
 class Hacha{
   var property largoMango
   var property pesoHoja
 
-  method poderOtorgado() { return largoMango * pesoHoja }
+  method poderOtorgado(guerrero) { return largoMango * pesoHoja }
 }
 
 class Baculo{
@@ -103,6 +99,12 @@ class Espada{
   method poderOtorgado(guerrero){
     return multiplicador * guerrero.valorOrigen()
   }
+}
+
+class Daga inherits Espada{
+  override method poderOtorgado(guerrero){ 
+    return super(guerrero) / 2
+}
 }
 
 object magiaElfica{
