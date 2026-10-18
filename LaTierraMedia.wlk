@@ -29,7 +29,7 @@ class Hobbit inherits Guerrero{
 }
 
 class Enano inherits Guerrero{
-  var property valorOrigen = 20
+  const property valorOrigen = 20
   var property factorDePoder
 
   method poder(){
@@ -38,11 +38,11 @@ class Enano inherits Guerrero{
 }
 
 class Elfo inherits Guerrero{
-  var property valorOrigen = 25
+  const property valorOrigen = 25
   const destrezaBase = 2
-  const property destrezaPropia
+  var property destrezaPropia
 
-  method poder() = self.vida() + (destrezaBase * self.destrezaPropia()) * self.poderArmas() 
+  method poder() = self.vida() + (destrezaBase + self.destrezaPropia()) * self.poderArmas()
 }
 
 class Maiar inherits Guerrero{
@@ -66,7 +66,7 @@ class Gollum inherits Hobbit{
 }
 
 class Humano inherits Guerrero{
-  var property valorOrigen = 15
+  const property valorOrigen = 15
   const property limitadorDePoder
 
   method poder() = self.vida() + self.poderArmas() / self.limitadorDePoder()
@@ -149,7 +149,7 @@ class CajaDeFlechas{
   }
 }
 
-object gandalf{
+/*object gandalf{
   var property vida = 100
   const property armas = []
   
@@ -171,7 +171,8 @@ object gandalf{
   method ganarVida(cantidad) {
     vida += cantidad
   }
-}
+}*/
+
 /* Parte 2 */
 object lebennin{
   var property cantidadGuardias = 0
