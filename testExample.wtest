@@ -1,8 +1,6 @@
 import LaTierraMedia.*
 
 describe "Pruebas de báculo" {
-  var baculoBase = new Baculo()
-  
   test "un báculo para un guerrero con mucha vida" {
     assert.equals(250,250)
   }/*
@@ -12,4 +10,16 @@ describe "Pruebas de báculo" {
   test "un báculo para un guerrero con poca vida tiene tope" {
     assert.equals(400, baculoBase.poderOtorgado(guerreroPocaVida))
   }*/
+}
+
+describe "Pruebas de arsenal" {
+  test "Espada con multiplicador de 15 y llevada Enano" {
+    var enano = new Enano(vida = 100, factorDePoder = 2)
+    var espada = new Espada(multiplicador = 15)
+    assert.equals(espada.poderOtorgado(enano), 300)
+}
+  test "Hacha con mango de 50 cm, con una hoja de 5kg" {
+    const hacha = new Hacha(largoMango = 50, pesoHoja = 5) 
+    assert.equals(hacha.poderOtorgado(), 250)
+}
 }

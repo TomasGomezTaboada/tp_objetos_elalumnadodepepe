@@ -5,13 +5,10 @@ class Guerrero{
 
   method tienePocaVida(){ return vida < 10}
 
-  method poder() {
-    const multiplicadorVida = if (self.tienePocaVida()) 200 else 15
-    return (vida * multiplicadorVida) + (self.poderArmas() * 2)
-  }
   method poderArmas() = armas.sum({ arma => arma.poderOtorgado(self) })
 
   method cantidadDeArmas() = armas.size()
+  method cantidadDeElementos() = elementosUtiles.size()
   method estaArmado() = !armas.isEmpty()
 
   method perderVida(cantidad) {
@@ -21,10 +18,59 @@ class Guerrero{
   method ganarVida(cantidad) {
     vida += cantidad
   }
+
+  method valorOrigen() {
+    return 10 * self.cantidadDeArmas()
+  }
 }
 
 class Hobbit inherits Guerrero{
-  method poder() = 10 
+  method poder() = self.vida() + self.cantidadDeElementos() * self.poderArmas()
+}
+
+class Enano inherits Guerrero{
+  var property valorOrigen = 20
+  var property factorDePoder
+
+  method poder(){
+    return self.vida() + self.factorDePoder() * self.poderArmas()
+  }
+}
+
+class Elfo inherits Guerrero{
+  var property valorOrigen = 25
+  const destrezaBase = 2
+  const property destrezaPropia
+
+  method poder() = self.vida() + (destrezaBase * self.destrezaPropia()) * self.poderArmas() 
+}
+
+class Maiar inherits Guerrero{
+  const poderBasico = 15
+  const poderBajoAmenaza = 300 
+  method poder(){
+    var factor = poderBasico
+
+    if(self.tienePocaVida()){
+      factor = poderBajoAmenaza
+    }
+
+    return self.vida() * factor + 2 * self.poderArmas()
+  }
+}
+
+class Gollum inherits Hobbit{
+  override method poder() {
+    return super.poder() / 2
+  }
+
+}
+
+class Humano inherits Guerrero{
+  var property valorOrigen = 15
+  const property limitadorDePoder
+
+  method poder() = self.vida() + self.poderArmas() / self.limitadorDePoder()
 }
 
 object daga{
@@ -35,7 +81,7 @@ class Hacha{
   var property largoMango
   var property pesoHoja
 
-  method poderOtorgado(guerrero) { return largoMango * pesoHoja }
+  method poderOtorgado() { return largoMango * pesoHoja }
 }
 
 class Baculo{
@@ -53,10 +99,10 @@ class Baculo{
 }
 
 class Espada{
-  var property magia = magiaElfica
+  var property multiplicador
 
   method poderOtorgado(guerrero){
-    return 10*magia.valorMagia(guerrero) + guerrero.valorOrigen()
+    return multiplicador * guerrero.valorOrigen()
   }
 }
 
