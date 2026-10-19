@@ -174,41 +174,151 @@ class CajaDeFlechas{
 }*/
 
 /* Parte 2 */
-object lebennin{
-  var property cantidadGuardias = 0
-  method poderRequerido() = if (cantidadGuardias > 3) 1500 else 1000
-  method puedePasar(viajero) = viajero.poder() > self.poderRequerido()
-  method pasar(viajero) {}
+class Grupo {
+  const property miembros = []
+
+  method integrantes() = miembros 
+  method agregar(guerrero) { miembros.add(guerrero) }
+
+  method totalDeElementos(nombre) = miembros.sum({ g => g.elementosUtiles().count({ e => e == nombre }) })
 }
 
-object minasDeTirith{
-  method puedePasar(viajero) = viajero.estaArmado()
-  method pasar(viajero) {
-    viajero.perderVida(10*viajero.cantidadDeArmas())
+object sinRequerimiento{
+  method cumple(viajeros) = true
+}
+
+class RequerimientoElemento{
+  const property cantidadMinima
+  const property nombreElemento
+
+  method cumple(viajeros) =
+    viajeros.sum ({ v => v.elementosUtiles().count({ e => e == nombreElemento }) }) >= cantidadMinima
+}
+
+class RequerimientoArmasMinimas{
+  const property cantidadMinima
+
+  method cumple(viajeros) =
+    viajeros.any({ v => v.cantidadDeArmas() >= cantidadMinima })
+  
+}
+
+class RequerimientoPoderMinimo{
+  const property poderMinimo
+
+  method cumple(viajeros) =
+    viajeros.any({ v => v.poder() >= poderMinimo })
+  
+}
+
+class RequerimientoVidaMinima{
+  const property vidaMinima
+
+  method cumple(viajeros) =
+    viajeros.any({ v => v.vida() >= vidaMinima })
+  
+}
+class Zona {
+  var property requerimientoExtra = sinRequerimiento
+
+  method normalizarViajeros(viajeroOGrupo) {
+    return if (viajeroOGrupo.respondsTo("integrantes")) {
+      viajeroOGrupo.integrantes()
+    } else if (viajeroOGrupo.respondsTo("forEach")) {
+      viajeroOGrupo
+    } else {
+      [viajeroOGrupo]
+    }
   }
+
+  method puedePasar(viajeros) {
+    const grupo = self.normalizarViajeros(viajeros)
+    return self.cumpleCondicionPropia(grupo) && requerimientoExtra.cumple(grupo)
+  }
+
+  method pasar(viajeros) {
+    if (!self.puedePasar(viajeros)) {
+      throw new DomainException(message = "No se puede pasar")
+    }
+    const grupo = self.normalizarViajeros(viajeros)
+    grupo.forEach({ g => self.aplicarEfecto(g) })
+  }
+
+  method cumpleCondicionPropia(grupo)
+  method aplicarEfecto(guerrero)
 }
 
-object lossarnach{
-  method puedePasar(viajero) = true
-  method pasar(viajero){
-    viajero.ganarVida(2*viajero.cantidadDeArmas())
+class ZonaDePoder inherits Zona{
+  const property poderExigido = 1500
+
+  override method cumpleCondicionPropia(grupo) = grupo.all({ g => g.poder() > self.poderExigido() })
+
+  override method aplicarEfecto(guerrero) {}
+}
+
+class Lebennin inherits ZonaDePoder{
+  var property cantidadGuardias = 0
+
+  override method poderExigido() = if (cantidadGuardias > 3) 1500 else 1000
+}
+
+class ZonaArmada inherits Zona{
+  var property danioPorArma = 0
+
+  override method cumpleCondicionPropia(grupo) = grupo.all({ g => g.estaArmado() })
+
+  override method aplicarEfecto(guerrero) {
+    guerrero.perderVida(danioPorArma * guerrero.cantidadDeArmas())
+
+  }
+} 
+
+class Lossarnach inherits Zona{
+  var property vidaGanadaPorArma = 2
+
+  override method cumpleCondicionPropia(grupo) = true
+
+  override method aplicarEfecto(guerrero) {
+    guerrero.ganarVida(vidaGanadaPorArma * guerrero.cantidadDeArmas())
   }
 }
 
 class Camino{
   const property zonas = []
-  method puedePasar(viajero) = zonas.all({ z => z.puedePasar(viajero) })
-  method pasar(viajero) {
-    zonas.forEach({ z => z.pasar(viajero) })
+
+  method puedePasar(viajeros) = zonas.all({ z => z.puedePasar(viajeros) })
+
+  method pasar(viajeros) {
+    if (!self.puedePasar(viajeros)) {
+      throw new DomainException(message = "No se puede pasar")
+    }
+    zonas.forEach({ z => z.pasar(viajeros) })
   }
 }
 
+class Region{
+  const property camino
+
+  method puedeAtravesar(viajeros) = camino.puedePasar(viajeros)
+
+  method atravesar(viajeros) {
+      camino.pasar(viajeros)
+  }
+}
+
+
 object tomBombadil{
-  method poder() = 2000
+  method poder() = 10000000
   method cantidadDeArmas() = 100
   method estaArmado() = true
+  method elementosUtiles() = []
   method perderVida(cantidad) {}
   method ganarVida(cantidad) {}
 }
 
-const gondor = new Camino(zonas = [lebennin, minasDeTirith])
+const lebennin = new Lebennin(cantidadGuardias = 2)
+const minasDeTirith = new ZonaArmada(danioPorArma = 10)
+const lossarnach = new Lossarnach()
+
+const caminoDeGondor = new Camino(zonas = [lebennin, minasDeTirith])
+const gondor = new Region(camino = caminoDeGondor)
