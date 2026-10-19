@@ -94,7 +94,20 @@ class Baculo{
 }
 
 class Espada{
-  var property multiplicador
+  var multiplicador
+
+  method initialize() {
+    self.setearMultiplicador(multiplicador)   // valida el valor con el que se creó
+  }
+
+  method setearMultiplicador(numero){
+    if(numero<1 || numero>20){
+      throw new Exception(message = "Multiplicador fuera de rango")
+    }
+    else{
+      multiplicador = numero
+    }
+  }
 
   method poderOtorgado(guerrero){
     return multiplicador * guerrero.valorOrigen()

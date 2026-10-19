@@ -28,10 +28,6 @@ const glamdir = new Espada(multiplicador = 10)
 const baculoGandalf = new Baculo(poderBase = 400)
 
 describe "Pruebas de arsenal" {
-  // Aclaración: Faltó hacer prueba de que las instanciaciones de espada acepten valores entre 1 y 20, esto es porque me di cuenta
-  // bastante tarde de que necesitaba un método para inicializar la espada y de ahí arrojar una exepción al darle
-  // un valor fuera del dominio, mea culpa.
-
   var enano1 = new Enano(vida = 100, factorDePoder = 2)
   var espada = new Espada(multiplicador = 15)
   test "Espada con multiplicador de 15 y llevada Enano" {
@@ -41,7 +37,16 @@ describe "Pruebas de arsenal" {
     const hacha1 = new Hacha(largoMango = 50, pesoHoja = 5) 
     assert.equals(hacha1.poderOtorgado(frodo), 250)
   }
-
+  test "Espada con multiplicador mayor a 21 falla"{
+    assert.throwsException(
+    {new Espada(multiplicador = 23)}
+    )
+  }
+  test "Espada con multiplicador menor a 1 falla"{
+    assert.throwsException(
+    {new Espada(multiplicador = -5)}
+    )
+  }
   const espada10 = new Espada(multiplicador = 10)
   const daga10 = new Daga(multiplicador = 10)
   const hacha = new Hacha(largoMango = 50, pesoHoja = 5)          // 250
