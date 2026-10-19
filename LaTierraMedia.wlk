@@ -129,13 +129,14 @@ object magiaEnana{
 }
 
 class FlechaBronce{
-  const dia
-  const mes
-  const anio
   const poderBase = 100
 
-  method poderOtorgado(fechaLustrado){
-    const tiempoDesdeLustrado = calendar.today() - fechaLustrado
+  method poderOtorgado(fechaLustrado, fechaUso){
+    if(fechaLustrado < fechaUso){
+      throw new Exception(message = "La flecha se usó antes de su lustrado/creacion")
+    }
+
+    const tiempoDesdeLustrado = fechaLustrado - fechaUso
 
     return 0.max(poderBase - tiempoDesdeLustrado)
   }
@@ -162,10 +163,15 @@ class CajaDeFlechas{
   }
 }
 
-/*object gandalf{
+// El gandalf como objeto/singleton, vestigio de la primera entrega.
+object gandalfObjeto{
   var property vida = 100
-  const property armas = []
+  const armas = []
   
+  method darArmas(nuevasArmas){
+    armas.addAll(nuevasArmas)
+  }
+
   method tienePocaVida() = vida < 10
 
   method poder() {
@@ -184,7 +190,7 @@ class CajaDeFlechas{
   method ganarVida(cantidad) {
     vida += cantidad
   }
-}*/
+}
 
 /* Parte 2 */
 class Grupo {
