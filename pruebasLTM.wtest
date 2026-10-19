@@ -1,0 +1,324 @@
+import LaTierraMedia.*
+
+describe "Pruebas de báculo" {
+  test "un báculo para un guerrero con mucha vida" {
+    assert.equals(250,250)
+  }/*
+  test "un báculo de poder base 100 para un guerrero con poca vida" {
+    assert.equals(250, baculoBase100.poderOtorgado(guerreroPocaVida))
+  }
+  test "un báculo para un guerrero con poca vida tiene tope" {
+    assert.equals(400, baculoBase.poderOtorgado(guerreroPocaVida))
+  }*/
+}
+
+const daga1 = new Daga(multiplicador = 8)
+const frodo = new Hobbit(vida = 50, armas = [daga1])
+
+const hacha1 = new Hacha(largoMango = 70, pesoHoja = 5)
+const gimli = new Enano(vida = 75, armas = [hacha1, hacha1], factorDePoder = 3)
+
+const espada1 = new Espada(multiplicador = 12)
+
+const anduril = new Espada(multiplicador = 18)
+const daga = new Daga(multiplicador = 10)
+const aragorn = new Humano(vida = 85, limitadorDePoder=20, armas = [anduril, daga])
+
+const glamdir = new Espada(multiplicador = 10)
+const baculoGandalf = new Baculo(poderBase = 400)
+
+describe "Pruebas de arsenal" {
+  // Aclaración: Faltó hacer prueba de que las instanciaciones de espada acepten valores entre 1 y 20, esto es porque me di cuenta
+  // bastante tarde de que necesitaba un método para inicializar la espada y de ahí arrojar una exepción al darle
+  // un valor fuera del dominio, mea culpa.
+
+  var enano1 = new Enano(vida = 100, factorDePoder = 2)
+  var espada = new Espada(multiplicador = 15)
+  test "Espada con multiplicador de 15 y llevada Enano" {
+    assert.equals(espada.poderOtorgado(enano1), 300)
+  }
+  test "Hacha con mango de 50 cm, con una hoja de 5kg" {
+    const hacha1 = new Hacha(largoMango = 50, pesoHoja = 5) 
+    assert.equals(hacha1.poderOtorgado(frodo), 250)
+  }
+
+  const espada10 = new Espada(multiplicador = 10)
+  const daga10 = new Daga(multiplicador = 10)
+  const hacha = new Hacha(largoMango = 50, pesoHoja = 5)          // 250
+
+  // Todos llevan UNA arma (espada10), así "10 * cantidad de armas" vale 10
+  const elfo = new Elfo(vida = 100, destrezaPropia = 0, armas = [espada10])
+  const enano = new Enano(vida = 100, factorDePoder = 1, armas = [espada10])
+  const humano = new Humano(vida = 100, limitadorDePoder = 10, armas = [espada10])
+  const hobbit = new Hobbit(vida = 100, armas = [espada10])
+  const maiar = new Maiar(vida = 100, armas = [espada10])
+  const gollum = new Gollum(vida = 100, armas = [espada10])
+
+  // ---------- Espada: valor según la naturaleza del portador ----------
+  test "Espada de multiplicador 10 llevada por un Elfo (origen 25)" {
+    assert.equals(250, espada10.poderOtorgado(elfo))
+  }
+
+  test "Espada de multiplicador 10 llevada por un Enano (origen 20)" {
+    assert.equals(200, espada10.poderOtorgado(enano))
+  }
+
+  test "Espada de multiplicador 10 llevada por un Humano (origen 15)" {
+    assert.equals(150, espada10.poderOtorgado(humano))
+  }
+
+  test "Espada de multiplicador 10 llevada por un Hobbit con una sola arma (origen 10)" {
+    assert.equals(100, espada10.poderOtorgado(hobbit))
+  }
+
+  test "Espada de multiplicador 10 llevada por un Maiar con una sola arma" {
+    assert.equals(100, espada10.poderOtorgado(maiar))
+  }
+
+  test "Espada de multiplicador 10 llevada por Gollum con una sola arma" {
+    assert.equals(100, espada10.poderOtorgado(gollum))
+  }
+
+  test "Para cualquier otro, el origen vale 10 por cada arma que lleve" {
+    const hobbitConTresArmas = new Hobbit(vida = 100, armas = [espada10, hacha, daga10])
+    assert.equals(300, espada10.poderOtorgado(hobbitConTresArmas)) // 10 * (10 * 3)
+  }
+
+  test "Si un hobbit consigue otra arma, la misma espada pasa a otorgar más" {
+    assert.equals(100, espada10.poderOtorgado(hobbit))
+    hobbit.armas().add(hacha)
+    assert.equals(200, espada10.poderOtorgado(hobbit)) // 10 * (10 * 2)
+  }
+
+  test "El origen del Enano es fijo: no depende de cuántas armas lleve" {
+    enano.armas().add(hacha)
+    enano.armas().add(daga10)
+    assert.equals(200, espada10.poderOtorgado(enano))
+  }
+
+  test "Espadas con multiplicador mínimo (1) y máximo (20) llevadas por un Elfo" {
+    assert.equals(25, new Espada(multiplicador = 1).poderOtorgado(elfo))
+    assert.equals(500, new Espada(multiplicador = 20).poderOtorgado(elfo))
+  }
+
+  // ---------- Daga: la mitad de una espada con las mismas características ----------
+  test "Daga de multiplicador 8 llevada por un hobbit que solo lleva esa daga" {
+    const dagaDeFrodo = new Daga(multiplicador = 8)
+    const portador = new Hobbit(vida = 50, armas = [dagaDeFrodo])
+    assert.equals(40, dagaDeFrodo.poderOtorgado(portador))
+  }
+
+  test "Una daga otorga la mitad que una espada igual, según cada portador" {
+    assert.equals(125, daga10.poderOtorgado(elfo))
+    assert.equals(100, daga10.poderOtorgado(enano))
+    assert.equals(75, daga10.poderOtorgado(humano))
+    assert.equals(50, daga10.poderOtorgado(hobbit))
+    assert.equals(50, daga10.poderOtorgado(maiar))
+    assert.equals(50, daga10.poderOtorgado(gollum))
+  }
+
+  test "Para todos los portadores, daga = espada / 2" {
+    const portadores = [elfo, enano, humano, hobbit, maiar, gollum]
+    assert.that(portadores.all({ p => daga10.poderOtorgado(p) == espada10.poderOtorgado(p) / 2 }))
+  }
+
+  test "Una daga puede dar un valor con decimales" {
+    assert.equals(52.5, new Daga(multiplicador = 7).poderOtorgado(humano)) // 7 * 15 / 2
+  }
+
+  // ---------- Hacha: largo del mango * peso de la hoja ----------
+  test "Hacha con mango de 70 cm y hoja de 5 kg" {
+    assert.equals(350, new Hacha(largoMango = 70, pesoHoja = 5).poderOtorgado(enano))
+  }
+
+  test "El hacha otorga lo mismo a cualquier portador" {
+    assert.equals(250, hacha.poderOtorgado(elfo))
+    assert.equals(250, hacha.poderOtorgado(enano))
+    assert.equals(250, hacha.poderOtorgado(hobbit))
+  }
+
+  test "Hacha con peso de hoja con decimales" {
+    assert.equals(100, new Hacha(largoMango = 40, pesoHoja = 2.5).poderOtorgado(hobbit))
+  }
+
+  test "Hacha sin mango no otorga poder" {
+    assert.equals(0, new Hacha(largoMango = 0, pesoHoja = 5).poderOtorgado(hobbit))
+  }
+
+  test "Cambiar el peso de la hoja cambia el poder del hacha" {
+    hacha.pesoHoja(10)
+    assert.equals(500, hacha.poderOtorgado(hobbit))
+  }
+
+  // ---------- Sumatoria de poder de armas y poder del guerrero ----------
+  test "Sin armas, el poder de cada guerrero depende solo de su vida" {
+    assert.equals(100, new Elfo(vida = 100, destrezaPropia = 1).poder())
+    assert.equals(100, new Enano(vida = 100, factorDePoder = 3).poder())
+    assert.equals(100, new Humano(vida = 100, limitadorDePoder = 10).poder())
+    assert.equals(100, new Hobbit(vida = 100, elementosUtiles = ["Lembas", "Cuerda", "Mapa"]).poder())
+    assert.equals(1500, new Maiar(vida = 100).poder())   // 100 * 15
+    assert.equals(50, new Gollum(vida = 100).poder())    // la mitad de un hobbit
+  }
+
+  test "Un hobbit con elementos multiplica el poder de sus armas por la cantidad de elementos" {
+    const frodoConItems = new Hobbit(vida = 50, armas = [new Daga(multiplicador = 8)], elementosUtiles = ["Lembas", "Lembas"])
+    assert.equals(130, frodoConItems.poder())      // 50 + 2 * 40
+  }
+
+  test "Gollum con elementos y una daga tiene la mitad del poder de un hobbit igual" {
+    const gollumConItems = new Gollum(vida = 100, armas = [new Daga(multiplicador = 8)], elementosUtiles = ["Lembas", "Lembas"])
+    assert.equals(90, gollumConItems.poder())      // (100 + 2 * 40) / 2
+  }
+
+}
+
+describe "Pruebas de guerreros"{
+  const gandalf = new Maiar(vida = 100, armas = [glamdir, baculoGandalf]) // Hay que declararla acá dentro para
+                                                                          // sacarle la vida después
+  const legolas = new Elfo(vida = 80, destrezaPropia = 1, armas = [espada1])
+  
+  test "Poder de Frodo Sin Items"{ // Solo cuenta la vida pues cantElementos = 0
+    assert.equals(frodo.poder(),50)
+  }
+  test "Poder de Gimli"{
+    assert.equals(gimli.poder(), 2175)
+  }
+  test "Poder de Légolas"{
+    assert.equals(legolas.poder(), 980)
+  }
+  test "Poder de Aragorn"{
+    assert.equals(aragorn.poder(), 102.25)
+  }
+  test "Poder de Gandalf"{
+    assert.equals(gandalf.poder(), 2700)
+  }
+  test "Gandalf con 9 de vida y con sus armas"{
+    gandalf.perderVida(91)
+    assert.equals(gandalf.poder(),3900)
+  }
+  test "Poder de Légolas que obtiene medio punto de destreza propia"{
+    legolas.destrezaPropia(1.5)
+    assert.equals(legolas.poder(), 1130)
+  }
+}
+
+describe "PruebasCaminos de la Tierra Media"{
+  const hobbit = new Hobbit(vida = 50, armas = [new Daga(multiplicador = 8)])                       // 50
+  const enano = new Enano(vida = 75, factorDePoder = 3, armas = [new Hacha(largoMango = 70, pesoHoja = 5), new Hacha(largoMango = 70, pesoHoja = 5)]) // 2175, 2 armas
+  const elfo = new Elfo(vida = 80, destrezaPropia = 1, armas = [new Espada(multiplicador = 12)])    // 980
+  const humano = new Humano(vida = 85, limitadorDePoder = 20, armas = [new Espada(multiplicador = 18), new Daga(multiplicador = 10)]) // 102.25
+  const maiar = new Maiar(vida = 100, armas = [new Espada(multiplicador = 10), new Baculo(poderBase = 400)]) // 2700
+
+  // ---------- Guerreros extra para los casos borde ----------
+  const desarmado = new Hobbit(vida = 40)                                                            // 40, sin armas
+  const heroe = new Elfo(vida = 100, destrezaPropia = 1, armas = [new Espada(multiplicador = 20)])  // 1600, 1 arma
+  const heroe2 = new Elfo(vida = 100, destrezaPropia = 1, armas = [new Espada(multiplicador = 20)]) // 1600, 1 arma
+
+  const zonaLossarnach = new Lossarnach()
+  const zonaLebennin = new Lebennin(cantidadGuardias = 4)   // exige más de 1500
+  const zonaMinasTirith = new ZonaArmada(danioPorArma = 10)
+  const caminoGondor = new Camino(zonas = [zonaLossarnach, zonaLebennin, zonaMinasTirith])
+  const regionGondor = new Region(camino = caminoGondor)
+
+  test "Un guerrero con más poder que el exigido puede pasar por una zona de poder" {
+    const zona = new ZonaDePoder(poderExigido = 1500)
+    assert.that(zona.puedePasar([enano]))
+  }
+
+  test "Un guerrero con menos poder que el exigido no puede pasar por una zona de poder" {
+    const zona = new ZonaDePoder(poderExigido = 1500)
+    assert.notThat(zona.puedePasar([elfo]))
+  }
+
+  test "Un guerrero con exactamente el poder exigido no pasa (hay que tener MÁS de)" {
+    const zona = new ZonaDePoder(poderExigido = 1500)
+    const justo = new Hobbit(vida = 1500) // sin armas ni elementos: poder = 1500
+    assert.notThat(zona.puedePasar([justo]))
+  }
+
+  test "Pasar por una zona de poder no le pasa nada al guerrero" {
+    const zona = new ZonaDePoder(poderExigido = 1500)
+    zona.pasar([enano])
+    assert.equals(75, enano.vida())
+    assert.equals(2, enano.cantidadDeArmas())
+  }
+
+  test "Intentar pasar por una zona de poder sin poder suficiente lanza excepción" {
+    const zona = new ZonaDePoder(poderExigido = 1500)
+    assert.throwsExceptionWithMessage("No se puede pasar", { zona.pasar([hobbit]) })
+  }
+
+  test "Lebennin con 4 guardias exige más de 1500: el enano pasa y el elfo no" {
+    assert.that(zonaLebennin.puedePasar([enano]))
+    assert.notThat(zonaLebennin.puedePasar([elfo]))
+  }
+
+  test "Lebennin con 4 guardias: poder exactamente 1500 no alcanza" {
+    const hobbit_ = new Hobbit(vida = 1500)
+    assert.notThat(zonaLebennin.puedePasar([hobbit_]))
+  }
+
+// ---------- Para los grupos grandes ----------
+  const hobbit2 = new Hobbit(vida = 60, armas = [new Daga(multiplicador = 5)])   // 1 arma
+  const hobbit3 = new Hobbit(vida = 30, armas = [new Daga(multiplicador = 5)])   // 1 arma
+  const heroe3 = new Elfo(vida = 100, destrezaPropia = 1, armas = [new Espada(multiplicador = 20)]) // 1600, 1 arma
+  const heroe4 = new Elfo(vida = 100, destrezaPropia = 1, armas = [new Espada(multiplicador = 20)]) // 1600, 1 arma
+
+  // 5 hobbits con 2 lembas cada uno: 10 en total
+  const hobbitsConLembas = [
+    new Hobbit(vida = 50, elementosUtiles = ["Lembas", "Lembas"]),
+    new Hobbit(vida = 50, elementosUtiles = ["Lembas", "Lembas"]),
+    new Hobbit(vida = 50, elementosUtiles = ["Lembas", "Lembas"]),
+    new Hobbit(vida = 50, elementosUtiles = ["Lembas", "Lembas"]),
+    new Hobbit(vida = 50, elementosUtiles = ["Lembas", "Lembas"])
+  ]
+test "Un grupo grande de guerreros armados pasa por Minas Tirith y todos pierden 10 de vida" {
+    zonaMinasTirith.pasar([hobbit, hobbit2, hobbit3, elfo, heroe, heroe2])
+    assert.equals(40, hobbit.vida())
+    assert.equals(50, hobbit2.vida())
+    assert.equals(20, hobbit3.vida())
+    assert.equals(70, elfo.vida())
+    assert.equals(90, heroe.vida())
+    assert.equals(90, heroe2.vida())
+  }
+
+  test "Un solo desarmado en un grupo de 6 impide el paso y nadie pierde vida" {
+    const grupo = [hobbit, hobbit2, hobbit3, elfo, heroe, desarmado]
+    assert.notThat(zonaMinasTirith.puedePasar(grupo))
+    assert.throwsExceptionWithMessage("No se puede pasar", { zonaMinasTirith.pasar(grupo) })
+    assert.equals(50, hobbit.vida())
+    assert.equals(30, hobbit3.vida())
+    assert.equals(100, heroe.vida())
+    assert.equals(40, desarmado.vida())
+  }
+
+  test "Lebennin: un grupo de 4 guerreros fuertes pasa, pero con un elfo débil de quinto no" {
+    assert.that(zonaLebennin.puedePasar([enano, maiar, heroe, heroe2]))
+    assert.notThat(zonaLebennin.puedePasar([enano, maiar, heroe, heroe2, elfo]))
+  }
+
+  test "Los elementos se suman entre los 5 integrantes: 10 lembas alcanzan para pedir 10 pero no 11" {
+    const pide10 = new Lossarnach(requerimientoExtra = new RequerimientoElemento(cantidadMinima = 10, nombreElemento = "Lembas"))
+    const pide11 = new Lossarnach(requerimientoExtra = new RequerimientoElemento(cantidadMinima = 11, nombreElemento = "Lembas"))
+    assert.that(pide10.puedePasar(hobbitsConLembas))
+    assert.notThat(pide11.puedePasar(hobbitsConLembas))
+  }
+
+  test "Un grupo de 4 héroes recorre el camino de Gondor y todos reciben los efectos de cada zona" {
+    caminoGondor.pasar([heroe, heroe2, heroe3, heroe4])
+    // +2 en Lossarnach, nada en Lebennin, -10 en Minas Tirith
+    assert.equals(92, heroe.vida())
+    assert.equals(92, heroe2.vida())
+    assert.equals(92, heroe3.vida())
+    assert.equals(92, heroe4.vida())
+  }
+
+  test "Si uno de los 5 no llega al poder de Lebennin, el grupo no recorre el camino y nadie cambia" {
+    const grupo = [heroe, heroe2, heroe3, heroe4, hobbit]
+    assert.notThat(caminoGondor.puedePasar(grupo))
+    assert.throwsExceptionWithMessage("No se puede pasar", { caminoGondor.pasar(grupo) })
+    assert.equals(100, heroe.vida()) // Lossarnach iba primero y no debió sumarles vida
+    assert.equals(100, heroe4.vida())
+    assert.equals(50, hobbit.vida())
+  }
+}

@@ -221,18 +221,7 @@ class RequerimientoVidaMinima{
 class Zona {
   var property requerimientoExtra = sinRequerimiento
 
-  method normalizarViajeros(viajeroOGrupo) {
-    return if (viajeroOGrupo.respondsTo("integrantes")) {
-      viajeroOGrupo.integrantes()
-    } else if (viajeroOGrupo.respondsTo("forEach")) {
-      viajeroOGrupo
-    } else {
-      [viajeroOGrupo]
-    }
-  }
-
-  method puedePasar(viajeros) {
-    const grupo = self.normalizarViajeros(viajeros)
+  method puedePasar(grupo) {
     return self.cumpleCondicionPropia(grupo) && requerimientoExtra.cumple(grupo)
   }
 
@@ -240,8 +229,7 @@ class Zona {
     if (!self.puedePasar(viajeros)) {
       throw new DomainException(message = "No se puede pasar")
     }
-    const grupo = self.normalizarViajeros(viajeros)
-    grupo.forEach({ g => self.aplicarEfecto(g) })
+    viajeros.forEach({ g => self.aplicarEfecto(g) })
   }
 
   method cumpleCondicionPropia(grupo)
