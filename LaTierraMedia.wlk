@@ -1,12 +1,19 @@
 class Guerrero{
-  const property armas = []
+  var property armas = []
   const property elementosUtiles = []
   var property vida
+  const property archiEnemigo = null
+  const property mejorAmigo = null
 
   method tienePocaVida(){ return vida < 10}
   method estaVivo() = vida > 0
 
   method poderArmas() = armas.sum({ arma => arma.poderOtorgado(self) })
+
+  method quitarArmaMasPoderosa(){
+    armas.sortBy({a1,a2 => a1>a2})
+    armas = armas.take(1)
+  }
 
   method cantidadDeArmas() = armas.size()
   method cantidadDeElementos() = elementosUtiles.size()
@@ -14,6 +21,10 @@ class Guerrero{
 
   method perderVida(cantidad) {
     vida = 0.max(vida - cantidad)
+  }
+
+  method duplicarVida(){
+    vida = 100.max(vida * 2)
   }
 
   method huir(){
@@ -391,5 +402,47 @@ object tacticaLaCuatroTresTres{
     if(guerrero.vida() < 60){
       oponente.atacar(guerrero, oponente.poder()*0.1)
     }
+  }
+}
+
+// --- Anillos ---
+
+class Anillo{
+  const duenio
+
+  method invocar(){
+    duenio.duplicarVida()
+  }
+}
+
+class AnilloDeFuego inherits Anillo{
+  override method invocar(){
+    super()
+    duenio.archiEnemigo().perderVida(20)
+  }
+}
+
+class AnilloMaldito inherits Anillo{
+  override method invocar(){
+    super()
+    duenio.quitarArmaMasPoderosa()
+  }
+}
+
+class AnilloDeAire inherits Anillo{
+  override method invocar(){
+    super()
+    duenio.mejorAmigo().ganarVida(30)
+  }
+}
+
+object anilloUnico{
+  var property duenio = null 
+
+  method invocar(){
+    duenio.duplicarVida()
+    var perdidaVida = if(duenio.cantidadDeArmas() < 3) 20 else 30  
+
+    duenio.perderVida(perdidaVida)
   }
 }
