@@ -46,6 +46,7 @@ describe "Pruebas de Gandalf en primera entrega (Gandalf como singleton)" {
   }
   test"El poder de gandalf con vida 5  y un arma de poder 100 más otra de 150"{
     gandalfObjeto.perderVida(95)
+    assert.equals(5, gandalfObjeto.vida())
     assert.equals(1500, gandalfObjeto.poder()) // Esta falla pero no pude encontrar la razón :((
   }
 }
@@ -365,5 +366,37 @@ test "Un grupo grande de guerreros armados pasa por Minas Tirith y todos pierden
     assert.equals(100, heroe.vida()) // Lossarnach iba primero y no debió sumarles vida
     assert.equals(100, heroe4.vida())
     assert.equals(50, hobbit.vida())
+  }
+}
+
+// -- Pruebas 3 ---
+
+describe "Pruenas de Combate"{
+  const gandalf = new Maiar(vida = 100, armas = [glamdir, baculoGandalf])
+  const guerreroSinVida = new Maiar(vida = 0)
+  const frodo = new Hobbit(vida = 50, armas = [daga1])
+  const hacha1 = new Hacha(largoMango = 70, pesoHoja = 5)
+  const SuperGimli = new Enano(vida = 75, armas = [hacha1, hacha1], factorDePoder = 999999999)
+  const anduril = new Espada(multiplicador = 18)
+  const daga = new Daga(multiplicador = 10)
+  const aragorn = new Humano(vida = 85, limitadorDePoder=20, armas = [anduril, daga])
+  const caruso20 = new TacticaCaruso(energia = 20)
+
+  test "Un guerrero sin vida no puede atacar"{
+    assert.throwsException({guerreroSinVida.iniciarAtaque(gandalf, tacticaAgil)})
+  }
+
+  test "Gandalf ataca a frodo con tactica de Resistencia"{
+    const vidaGandalfAfterAtack = gandalf.vida() - (frodo.poder()/2) * 0.1
+    const vidaFrodoAfterAtack = frodo.vida() - gandalf.poder() * 0.1
+    gandalf.iniciarAtaque(frodo, tacticaResistencia)
+
+    assert.equals(gandalf.vida(), vidaGandalfAfterAtack)
+    assert.equals(frodo.vida(), 0.max(vidaFrodoAfterAtack))
+  }
+
+  test "Aragorn ataca a superGimli con táctica caruso 20"{
+    aragorn.iniciarAtaque(gimli, caruso20)
+    assert.equals(aragorn.vida(), 75)
   }
 }

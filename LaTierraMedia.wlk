@@ -4,6 +4,7 @@ class Guerrero{
   var property vida
 
   method tienePocaVida(){ return vida < 10}
+  method estaVivo() = vida > 0
 
   method poderArmas() = armas.sum({ arma => arma.poderOtorgado(self) })
 
@@ -15,12 +16,34 @@ class Guerrero{
     vida = 0.max(vida - cantidad)
   }
 
+  method huir(){
+    self.perderVida(10)
+  }
+
   method ganarVida(cantidad) {
     vida += cantidad
   }
 
   method valorOrigen() {
     return 10 * self.cantidadDeArmas()
+  }
+
+  method iniciarAtaque(adversario, tactica){
+    tactica.usarTactica(self, adversario)
+  }
+
+  method atacar(adversario, danio){
+    if (self.estaVivo())
+    {
+      adversario.recibirDanio(danio)
+    }
+    else{
+      throw new Exception(message = "Guerrero sin vida para atacar")
+    }
+  }
+
+  method recibirDanio(danio){
+    self.perderVida(danio)
   }
 }
 
@@ -175,7 +198,7 @@ object gandalfObjeto{
   method tienePocaVida() = vida < 10
 
   method poder() {
-    const multiplicadorVida = if (self.tienePocaVida()) 200 else 15
+    var multiplicadorVida = if (self.tienePocaVida()) 200 else 15
     return (vida * multiplicadorVida) + (self.poderArmas() * 2)
   }
   method poderArmas() = armas.sum({ arma => arma.poderOtorgado(self) })
@@ -329,3 +352,44 @@ const lossarnach = new Lossarnach()
 
 const caminoDeGondor = new Camino(zonas = [lebennin, minasDeTirith])
 const gondor = new Region(camino = caminoDeGondor)
+
+
+
+// --- Parte 3 ---
+// cada acción de ataque descuenta la vida del oponente en el 10% del poder calculado del atacante
+object tacticaAgil{
+  method usarTactica(guerrero, oponente){
+      guerrero.atacar(oponente, (guerrero.poder() + 100) * 0.1)
+      oponente.atacar(guerrero, (oponente.poder()) * 0.1)
+  }
+}
+
+object tacticaResistencia{
+  method usarTactica(guerrero, oponente){
+    oponente.atacar(guerrero,(oponente.poder()/2) * 0.1)
+    guerrero.atacar(oponente, guerrero.poder() * 0.1)
+  }
+}
+
+class TacticaCaruso{
+  const energia
+
+  method usarTactica(guerrero, oponente){
+    if(oponente.poder() < energia){
+      guerrero.atacar(oponente, guerrero.poder() * 0.1)
+    } 
+    else{
+      guerrero.huir()
+    }
+  }
+}
+
+object tacticaLaCuatroTresTres{
+  method usarTactica(guerrero, oponente){
+    guerrero.atacar(oponente, guerrero.poder()* 0.1 * 2)
+
+    if(guerrero.vida() < 60){
+      oponente.atacar(guerrero, oponente.poder()*0.1)
+    }
+  }
+}
