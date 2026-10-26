@@ -436,8 +436,10 @@ class AnilloDeAire inherits Anillo{
   }
 }
 
+const gollum = new Gollum(vida = 100)
+
 object anilloUnico{
-  var property duenio = null 
+  var property duenio = gollum
 
   method invocar(){
     duenio.duplicarVida()
@@ -445,4 +447,10 @@ object anilloUnico{
 
     duenio.perderVida(perdidaVida)
   }
+
+  method nuevoDuenio(nuevoDuenio){
+    duenio = nuevoDuenio
+  }
 }
+
+// --- Penalidades

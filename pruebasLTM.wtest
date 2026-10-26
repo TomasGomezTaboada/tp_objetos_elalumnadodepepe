@@ -45,6 +45,7 @@ describe "Pruebas de Gandalf en primera entrega (Gandalf como singleton)" {
     assert.equals(2000, gandalfObjeto.poder())
   }
   test"El poder de gandalf con vida 5  y un arma de poder 100 más otra de 150"{
+    gandalfObjeto.darArmas([baculoBase100, baculoBase150])
     gandalfObjeto.perderVida(95)
     assert.equals(5, gandalfObjeto.vida())
     assert.equals(1500, gandalfObjeto.poder()) // Esta falla pero no pude encontrar la razón :((
@@ -410,5 +411,23 @@ describe "Prueba de Anillos"{
     anilloFuego.invocar()
     assert.equals(frodo.vida(), 100)
     assert.equals(gollum.vida(), 80)
+  }
+  test "Anillo unico con gollum (Dueño original)"{
+    anilloUnico.invocar()
+    assert.equals(anilloUnico.duenio().vida(), 180)
+    const daga = new Daga(multiplicador = 10)
+    frodo.armas().add(daga)
+    frodo.armas().add(daga)
+    frodo.armas().add(daga)
+    anilloUnico.nuevoDuenio(frodo)
+    anilloUnico.invocar()
+    assert.equals(anilloUnico.duenio().vida(), 70)
+  }
+  test "Anillo de aire con gandalf"{
+    const gandalf = new Maiar(vida = 100, armas = [glamdir, baculoGandalf], mejorAmigo = frodo)
+    const anilloDeAire = new AnilloDeAire(duenio = gandalf)
+    anilloDeAire.invocar()
+    assert.equals(gandalf.vida(), 200)
+    assert.equals(frodo.vida(), 80)
   }
 }
