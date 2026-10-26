@@ -421,6 +421,7 @@ describe "Prueba de Anillos"{
     frodo.armas().add(daga)
     anilloUnico.nuevoDuenio(frodo)
     anilloUnico.invocar()
+    assert.equals(frodo.armas(), [daga,daga,daga])
     assert.equals(anilloUnico.duenio().vida(), 70)
   }
   test "Anillo de aire con gandalf"{
@@ -430,4 +431,5 @@ describe "Prueba de Anillos"{
     assert.equals(gandalf.vida(), 200)
     assert.equals(frodo.vida(), 80)
   }
+
 }

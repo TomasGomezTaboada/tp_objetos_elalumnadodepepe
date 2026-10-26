@@ -11,8 +11,8 @@ class Guerrero{
   method poderArmas() = armas.sum({ arma => arma.poderOtorgado(self) })
 
   method quitarArmaMasPoderosa(){
-    armas.sortBy({a1,a2 => a1>a2})
-    armas = armas.take(1)
+    const masPoderosa = armas.max({arma => arma.poderOtorgado(self)})
+    armas.remove(masPoderosa)
   }
 
   method cantidadDeArmas() = armas.size()
@@ -326,11 +326,16 @@ class Lossarnach inherits Zona{
 
 class Camino{
   const property zonas = []
+  const penalizaciones = []
 
   method puedePasar(viajeros) = zonas.all({ z => z.puedePasar(viajeros) })
 
   method pasar(viajeros) {
     if (!self.puedePasar(viajeros)) {
+      penalizaciones.forEach({ penalidad => 
+        viajeros.forEach({ viajero => penalidad.penalizar(viajero)})
+      })
+
       throw new DomainException(message = "No se puede pasar")
     }
     zonas.forEach({ z => z.pasar(viajeros) })
@@ -453,4 +458,5 @@ object anilloUnico{
   }
 }
 
-// --- Penalidades
+// --- Penalidades // penalizar(viajero)
+
