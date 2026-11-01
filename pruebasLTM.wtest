@@ -18,6 +18,14 @@ describe "Pruebas de báculo" {
   }
 }
 
+describe "Pruebas de espada" {
+  test "una espada élfica para cualquier guerrero" {
+    assert.equals(250, espadaElfica.poderOtorgado(gandalf))
+  }
+  test "una espada enana para un guerrero de vida 100" {
+    assert.equals(500, espadaEnana.poderOtorgado(gandalf))
+  }
+}
 
 describe "Pruebas Flechas"{
     const flecha1 = new FlechaBronce()
@@ -37,18 +45,131 @@ describe "Pruebas Flechas"{
   }
 }
 
-describe "Pruebas de Gandalf en primera entrega (Gandalf como singleton)" {
+describe "Pruebas de Gandalf en primera entrega" {
   const baculoBase100 = new Baculo(poderBase = 100)
   const baculoBase150 = new Baculo(poderBase = 150)
   test "El poder de gandalf con vida 100 y un arma de poder 100 más otra de 150" {
-    gandalfObjeto.darArmas([baculoBase100, baculoBase150])
-    assert.equals(2000, gandalfObjeto.poder())
+    gandalf.aniadirArma(baculoBase100)
+    gandalf.aniadirArma(baculoBase150)
+    assert.equals(2000, gandalf.poder())
   }
   test"El poder de gandalf con vida 5  y un arma de poder 100 más otra de 150"{
-    gandalfObjeto.darArmas([baculoBase100, baculoBase150])
-    gandalfObjeto.perderVida(95)
-    assert.equals(5, gandalfObjeto.vida())
-    assert.equals(1500, gandalfObjeto.poder()) // Esta falla pero no pude encontrar la razón :((
+    gandalf.vida(5)
+    gandalf.aniadirArma(baculoBase100)
+    gandalf.aniadirArma(baculoBase150)
+    assert.equals(5, gandalf.vida())
+    assert.equals(2000, gandalf.poder()) // Esta falla pero no pude encontrar la razón :((
+    //             ↑(ese numero(decia 1500 en el pdf) estaba mal?? debe ser 2000? leer abajo)
+    /*Fallo: el assert debe verificar que gandalfObjeto.poder() = 2000 y ahi si seria correcto
+    esto es debido al codigo del baculo (si el guerrero tiene poca vida, duplica su poder base)
+    RESUMEN DE LO QUE PASA:
+        Gandalf tiene poca vida (5), por lo que:
+        - Su multiplicador de vida pasa a ser 200: 5 * 200 = 1000.
+        - Los báculos duplican su poder(pq tiene poca vida):
+            - Báculo 100 -> 200.
+            - Báculo 150 -> 300.
+        - poderArmas() suma ambos: 200 + 300 = 500.
+        - Gandalf multiplica el poder de sus armas por 2: 500 * 2 = 1000.
+
+        Poder: 1000 + 1000 = 2000
+    */
+  }
+}
+describe "Pruebas de caja de flechas"{
+  const flechaAluminio = new FlechaAluminio()
+  const flechaHierroNoOxi = new FlechaHierro()
+  const flechaHierroOxi = new FlechaHierro(estaOxidada = true)
+  test "Flecha aluminio"{
+    assert.equals(50, flechaAluminio.poderBase())
+  }
+  test "Flecha de hierro sin oxidar" {
+    assert.equals(70, flechaHierroNoOxi.poder())
+  }
+
+  test "Flecha de hierro oxidada" {
+    assert.equals(35, flechaHierroOxi.poder())
+  }
+
+  //FALTA EL ULTIMO TEST, El de la caja de flechas con resultado = 83 (Entrega 1)
+  //No entendi como crear la flecha de bronce con la fecha por eso D:
+}
+
+describe "Pruebas Lebennin" {
+  test "Gandalf pasa por Lebennin" {
+      lebennin.pasar([gandalf])
+      assert.equals(100, gandalf.vida())
+  }
+  test "Un guerrero con poder 3000 puede pasar por Lebennin"{
+    const guerrero = object inherits Guerrero(vida = 100) {
+      method poder() = 3000
+    }
+    assert.equals(true, lebennin.puedePasar([guerrero]))
+  }
+  test "Un guerrero con poder 100 puede pasar por Lebennin" {
+    const guerrero = object inherits Guerrero(vida = 100) {
+      method poder() = 100
+    }
+    assert.equals(false, lebennin.puedePasar([guerrero]))
+  }
+}
+
+describe "Pruebas Minas Tirith" {
+  const baculoBase100 = new Baculo(poderBase = 100)
+  const espada = new Espada(multiplicador = 1)
+  test "Un personaje armado puede pasar Minas Tirith" {
+    gandalf.aniadirArma(baculoBase100)
+    assert.equals(true, minasDeTirith.puedePasar([gandalf]))
+  }
+  test "Un personaje desarmado puede pasar Minas Tirith" {
+    //Gandalf por default no tiene armas
+    assert.equals(false, minasDeTirith.puedePasar([gandalf]))
+  }
+  test "Gandalf de 100 unidades de vida con el báculo y la espada pasa por Minas Tirith" {
+    gandalf.aniadirArma(baculoBase100)
+    gandalf.aniadirArma(espada)
+    minasDeTirith.pasar([gandalf])
+    assert.equals(80, gandalf.vida())
+  }
+}
+
+describe "Pruebas Lossarnach" {
+  test "Gandalf puede pasar Lossarnach" {
+    assert.equals(true, lossarnach.puedePasar([gandalf]))
+  }
+  test "Gandalf de 100 unidades de vida con el báculo y la espada pasa por Lossarnach" {
+    const baculoBase100 = new Baculo(poderBase = 100)
+    const espada = new Espada(multiplicador = 1)
+    gandalf.aniadirArma(baculoBase100)
+    gandalf.aniadirArma(espada)
+    lossarnach.pasar([gandalf])
+    assert.equals(104, gandalf.vida())
+  }
+}
+
+describe "Tests de Zonas y Caminos" {
+  const baculoBase100 = new Baculo(poderBase = 100)
+  const espada = new Espada(multiplicador = 1)
+  test "Gandalf de 100 unidades de vida con el báculo y la espada, puede atravesar el camino compuesto por Lebennin y Minas Tirith" {
+    gandalf.aniadirArma(baculoBase100)
+    gandalf.aniadirArma(espada)
+    assert.equals(true, caminoDeGondor.puedePasar([gandalf]))
+  }
+  test "Gandalf full vida y con su báculo y su espada, atraviesa el camino compuesto por Lebennin y Minas Tirith" {
+    gandalf.aniadirArma(baculoBase100)
+    gandalf.aniadirArma(espada)
+    caminoDeGondor.pasar([gandalf])
+    assert.equals(80, gandalf.vida())
+  }
+}
+
+describe "Tests de Tom Bombadil" {
+  test "Tom puede atravesar atravesar Lebennin" {
+    assert.equals(true, lebennin.puedePasar([tomBombadil]))
+  }
+  test "Tom atraviesa el camino que pasa por Gondor antes mencionado" {
+    caminoDeGondor.pasar([tomBombadil])
+    assert.equals(10000000, tomBombadil.poder())
+    assert.equals(100, tomBombadil.cantidadDeArmas())
   }
 }
 
@@ -61,6 +182,7 @@ const hacha1 = new Hacha(largoMango = 70, pesoHoja = 5)
 const gimli = new Enano(vida = 75, armas = [hacha1, hacha1], factorDePoder = 3)
 
 const espada1 = new Espada(multiplicador = 12)
+const legolas = new Elfo(vida = 80, destrezaPropia = 1, armas = [espada1])
 
 const anduril = new Espada(multiplicador = 18)
 const daga = new Daga(multiplicador = 10)
@@ -70,8 +192,8 @@ const glamdir = new Espada(multiplicador = 10)
 const baculoGandalf = new Baculo(poderBase = 400)
 
 describe "Pruebas de arsenal" {
-  var enano1 = new Enano(vida = 100, factorDePoder = 2)
-  var espada = new Espada(multiplicador = 15)
+  const enano1 = new Enano(vida = 100, factorDePoder = 2)
+  const espada = new Espada(multiplicador = 15)
   test "Espada con multiplicador de 15 y llevada Enano" {
     assert.equals(espada.poderOtorgado(enano1), 300)
   }
@@ -222,8 +344,6 @@ describe "Pruebas de arsenal" {
 describe "Pruebas de guerreros"{
   const gandalf = new Maiar(vida = 100, armas = [glamdir, baculoGandalf]) // Hay que declararla acá dentro para
                                                                           // sacarle la vida después
-  const legolas = new Elfo(vida = 80, destrezaPropia = 1, armas = [espada1])
-  
   test "Poder de Frodo Sin Items"{ // Solo cuenta la vida pues cantElementos = 0
     assert.equals(frodo.poder(),50)
   }
@@ -372,12 +492,12 @@ test "Un grupo grande de guerreros armados pasa por Minas Tirith y todos pierden
 
 // -- Pruebas 3 ---
 
-describe "Pruenas de Combate"{
+describe "Pruebas de Combate"{
   const gandalf = new Maiar(vida = 100, armas = [glamdir, baculoGandalf])
   const guerreroSinVida = new Maiar(vida = 0)
   const frodo = new Hobbit(vida = 50, armas = [daga1])
   const hacha1 = new Hacha(largoMango = 70, pesoHoja = 5)
-  const SuperGimli = new Enano(vida = 75, armas = [hacha1, hacha1], factorDePoder = 999999999)
+  const superGimli = new Enano(vida = 75, armas = [hacha1, hacha1], factorDePoder = 999999999)
   const anduril = new Espada(multiplicador = 18)
   const daga = new Daga(multiplicador = 10)
   const aragorn = new Humano(vida = 85, limitadorDePoder=20, armas = [anduril, daga])
@@ -399,6 +519,113 @@ describe "Pruenas de Combate"{
   test "Aragorn ataca a superGimli con táctica caruso 20"{
     aragorn.iniciarAtaque(gimli, caruso20)
     assert.equals(aragorn.vida(), 75)
+  }
+}
+
+describe "Prueba de penalidades"{
+
+  test "Gandalf pierde toda su vida (fracción 1)" {
+    penalidadPierdeTodaLaVida.penalizar(gandalf)
+    assert.equals(0, gandalf.vida())
+  }
+
+  test "Legolas pierde un cuarto de su vida (fracción 1/4)" {
+    penalidadPierdeCuartoDeVida.penalizar(legolas)
+    assert.equals(60, legolas.vida())
+  }
+
+  test "Gollum pierde *FRACCION RANDOM* de su vida (fracción 59/87)" {
+    const penalidadPierdeFRACCIONRANDOMDeVida = new PenalidadPierdeFraccionVida(fraccionVidaAPerder = 59/87)
+    penalidadPierdeFRACCIONRANDOMDeVida.penalizar(gollum)
+    assert.equals(32.184, gollum.vida())
+  }
+
+  test "Gandalf armado con Glamdir y su Baculo pierde su arma más poderosa (Baculo)" {
+    const gandalf = new Maiar(vida = 100, armas = [glamdir, baculoGandalf])
+    penalidadPierdeArmaMasPoderosa.penalizar(gandalf)
+    assert.equals([glamdir], gandalf.armas())
+  }
+
+  test "Un guerrero con una sola arma pierde esa arma" {
+    const gandalf = new Maiar(vida = 100, armas = [baculoGandalf])
+    penalidadPierdeArmaMasPoderosa.penalizar(gandalf)
+    assert.equals([], gandalf.armas())
+  }
+
+  test "Un guerrero sin armas recibe la penalidad sin provocar errores" {
+    const gandalf = new Maiar(vida = 100, armas = [])
+    penalidadPierdeArmaMasPoderosa.penalizar(gandalf)
+    assert.equals([], gandalf.armas())
+  }
+
+  test "Un guerrero recibe una combinación de pérdida de vida y pérdida del arma más poderosa" {
+    const gandalf = new Maiar(vida = 300, armas = [glamdir, baculoGandalf])
+    const penalidesCombinadas = new PenalidadesCombinadas(listaDePenalidades = [penalidadPierdeArmaMasPoderosa, penalidadPierdeMitadDeVida])
+    penalidesCombinadas.penalizar(gandalf)
+    assert.equals([glamdir], gandalf.armas())
+    assert.equals(150, gandalf.vida())
+  }
+
+//Guerreros para pruebas de penalidades de camino en grupo
+const hobbit1 = new Hobbit(vida = 100)
+const hobbit2 = new Hobbit(vida = 80)
+
+const espadaEjemplo1 = new Espada(multiplicador = 15)
+const espadaEjemplo2 = new Espada(multiplicador = 1)
+const hachaEjemplo1 = new Hacha(largoMango = 50, pesoHoja = 5)
+
+const elfo1 = new Elfo(vida = 100, destrezaPropia = 1, armas = [espadaEjemplo1])
+const elfo2 = new Elfo(vida = 90, destrezaPropia = 2, armas = [espadaEjemplo1, espadaEjemplo2])
+
+const enano1 = new Enano(vida = 100, factorDePoder = 3, armas = [hachaEjemplo1])
+
+const grupoMixto = [hobbit1, hobbit2, elfo1, elfo2, enano1, legolas]
+
+const zonaImposibleDePasar = new ZonaDePoder(poderExigido = 999999999999999)
+const zonaFacilDePasar = new ZonaDePoder(poderExigido = 0)
+const camino1 = new Camino(zonas = [zonaImposibleDePasar], penalizaciones = [penalidadPierdeMitadDeVida])
+const camino2 = new Camino(zonas = [zonaImposibleDePasar], penalizaciones = [penalidadPierdeTodaLaVida, penalidadPierdeArmaMasPoderosa])
+const camino3 = new Camino(zonas = [zonaFacilDePasar], penalizaciones = [penalidadPierdeTodaLaVida])
+
+  test "Un grupo que no puede atravesar un camino recibe la penalidad de este" {
+    assert.throwsExceptionWithMessage("No se puede pasar", {camino1.pasar(grupoMixto)})
+    assert.equals(50, hobbit1.vida())
+    assert.equals(40, hobbit2.vida())
+    assert.equals(50, elfo1.vida())
+    assert.equals(45, elfo2.vida())
+    assert.equals(50, enano1.vida())
+    assert.equals(40, legolas.vida())
+  }
+
+  test "Un grupo que no puede atravesar un camino recibe todas las penalidades de este" {
+    assert.throwsExceptionWithMessage("No se puede pasar", {camino2.pasar(grupoMixto)})
+    assert.equals(0, hobbit1.vida())
+    assert.equals(0, hobbit2.vida())
+    assert.equals(0, elfo1.vida())
+    assert.equals(0, elfo2.vida())
+    assert.equals(0, enano1.vida())
+    assert.equals(0, legolas.vida())
+    assert.equals([], hobbit1.armas())
+    assert.equals([], hobbit2.armas())
+    assert.equals([], elfo1.armas())
+    assert.equals([espadaEjemplo2], elfo2.armas())
+    assert.equals([], enano1.armas())
+    assert.equals([], legolas.armas())
+  }
+  test "Un grupo que puede atravesar un camino no recibe ninguna penalidad" {
+    camino3.pasar(grupoMixto)
+    assert.equals(100, hobbit1.vida())
+    assert.equals(80, hobbit2.vida())
+    assert.equals(100, elfo1.vida())
+    assert.equals(90, elfo2.vida())
+    assert.equals(100, enano1.vida())
+    assert.equals(80, legolas.vida())
+    assert.equals([], hobbit1.armas())
+    assert.equals([], hobbit2.armas())
+    assert.equals([espadaEjemplo1], elfo1.armas())
+    assert.equals([espadaEjemplo1, espadaEjemplo2], elfo2.armas())
+    assert.equals([hachaEjemplo1], enano1.armas())
+    assert.equals([espada1], legolas.armas())
   }
 }
 

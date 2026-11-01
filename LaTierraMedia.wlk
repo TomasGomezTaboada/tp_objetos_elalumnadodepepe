@@ -10,6 +10,10 @@ class Guerrero{
 
   method poderArmas() = armas.sum({ arma => arma.poderOtorgado(self) })
 
+  method aniadirArma(arma){
+    armas.add(arma)
+  }
+
   method quitarArmaMasPoderosa(){
     const masPoderosa = armas.max({arma => arma.poderOtorgado(self)})
     armas.remove(masPoderosa)
@@ -147,7 +151,20 @@ class Espada{
     return multiplicador * guerrero.valorOrigen()
   }
 }
+//objects espadasElfica/Enana que se adecuan a lo que pedian los tests de la entrega 1
+object espadaElfica{
+  var property magia = magiaElfica
+  method poderOtorgado(guerrero){
+      return 10*magia.valorMagia(guerrero)
+  }
+}
 
+object espadaEnana{
+  var property magia = magiaEnana
+  method poderOtorgado(guerrero){
+      return 10*magia.valorMagia(guerrero)
+  }
+}
 class Daga inherits Espada{
   override method poderOtorgado(guerrero){ 
     return super(guerrero) / 2
@@ -196,9 +213,18 @@ class CajaDeFlechas{
     return utiles.sum({ f => f.poder() }) / utiles.size()
   }
 }
+//gandalf(1ra entrega) simplificado mediante herencia de class Guerrero
+object gandalf inherits Guerrero(vida = 100){
+    method poder(){
+        if(self.tienePocaVida()){
+            return vida * 200 + (self.poderArmas()) * 2
+        }
+        return vida * 15 + (self.poderArmas()) * 2
+    }
+}
 
 // El gandalf como objeto/singleton, vestigio de la primera entrega.
-object gandalfObjeto{
+/* object gandalfObjeto{
   var property vida = 100
   const armas = []
   
@@ -225,6 +251,7 @@ object gandalfObjeto{
     vida += cantidad
   }
 }
+*/
 
 /* Parte 2 */
 class Grupo {
@@ -326,7 +353,7 @@ class Lossarnach inherits Zona{
 
 class Camino{
   const property zonas = []
-  const penalizaciones = []
+  const property penalizaciones = []
 
   method puedePasar(viajeros) = zonas.all({ z => z.puedePasar(viajeros) })
 
@@ -368,8 +395,6 @@ const lossarnach = new Lossarnach()
 
 const caminoDeGondor = new Camino(zonas = [lebennin, minasDeTirith])
 const gondor = new Region(camino = caminoDeGondor)
-
-
 
 // --- Parte 3 ---
 // cada acción de ataque descuenta la vida del oponente en el 10% del poder calculado del atacante
@@ -460,3 +485,31 @@ object anilloUnico{
 
 // --- Penalidades // penalizar(viajero)
 
+class PenalidadPierdeFraccionVida{
+  var property fraccionVidaAPerder
+
+  method penalizar(guerrero){
+    guerrero.perderVida(guerrero.vida() * fraccionVidaAPerder)
+  }
+}
+
+//Implementaciones de ejemplo de la class PenalidadPierdeFraccionVida
+const penalidadPierdeTodaLaVida = new PenalidadPierdeFraccionVida(fraccionVidaAPerder = 1)
+const penalidadPierdeMitadDeVida = new PenalidadPierdeFraccionVida(fraccionVidaAPerder = 1/2)
+const penalidadPierdeCuartoDeVida = new PenalidadPierdeFraccionVida(fraccionVidaAPerder = 1/4)
+
+object penalidadPierdeArmaMasPoderosa{
+  method penalizar(guerrero){
+    if (guerrero.estaArmado()){
+      guerrero.quitarArmaMasPoderosa()
+    }
+  }
+}
+
+class PenalidadesCombinadas{
+  var property listaDePenalidades = []
+
+  method penalizar(guerrero){
+    listaDePenalidades.forEach({unaPenalidad => unaPenalidad.penalizar(guerrero)})
+  }
+}
