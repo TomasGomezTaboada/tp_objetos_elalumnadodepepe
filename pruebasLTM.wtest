@@ -639,7 +639,7 @@ describe "Prueba de Anillos"{
     assert.equals(frodo.vida(), 50)
     assert.equals(gollum.vida(), 80)
   }
-  test "Anillo unico con gollum (Dueño original)"{
+  test "Anillo unico con gollum (Dueño original), luego nuevo dueño es Frodo"{
     anilloUnico.invocar()
     assert.equals(anilloUnico.duenio().vida(), 80) // El gollum está definido en LTM.wlk
     const daga = new Daga(multiplicador = 10)
