@@ -28,7 +28,7 @@ class Guerrero{
   }
 
   method duplicarVida(){
-    vida = 100.max(vida * 2)
+    vida = 100.min(vida * 2)
   }
 
   method huir(){
@@ -438,7 +438,7 @@ object tacticaLaCuatroTresTres{
 // --- Anillos ---
 
 class Anillo{
-  const duenio
+  var property duenio
 
   method invocar(){
     duenio.duplicarVida()
@@ -468,14 +468,12 @@ class AnilloDeAire inherits Anillo{
 
 const gollum = new Gollum(vida = 100)
 
-object anilloUnico{
-  var property duenio = gollum
+object anilloUnico inherits Anillo(duenio = gollum){
+  override method invocar(){
+    super()
+    var cantidadVidaPerdida = if(duenio.cantidadDeArmas() < 3) 20 else 30  
 
-  method invocar(){
-    duenio.duplicarVida()
-    var perdidaVida = if(duenio.cantidadDeArmas() < 3) 20 else 30  
-
-    duenio.perderVida(perdidaVida)
+    duenio.perderVida(cantidadVidaPerdida)
   }
 
   method nuevoDuenio(nuevoDuenio){
